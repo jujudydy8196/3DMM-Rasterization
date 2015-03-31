@@ -173,7 +173,7 @@ Model* readObj(const string filename)
 	model->vertices = new float[model->numVertices*3+1];
 	model->normals = new float[model->numNormals*3+1];
 	model->triangles = new Triangle[model->numTriangles];
-	model->projects = new int[model->numVertices*3+1]; 
+	model->projects = new int[model->numVertices*3+1];
 	/* go back to the beginning of the stream and read data in the second pass */
 	ifs.close();
 	ifs.open(filename.c_str(), ios::in);
