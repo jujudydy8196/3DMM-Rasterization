@@ -109,18 +109,40 @@ void init()
 void DrawLine(int vStart, int vEnd)
 {
 		int vs_x,vs_y,vs_z,ve_x,ve_y,ve_z;
-		float m,b;
+		float m,b,z;
 		vs_x = modelPtr[curModelIdx]->projects[3*vStart  ];
 		vs_y = modelPtr[curModelIdx]->projects[3*vStart+1];
 		vs_z = modelPtr[curModelIdx]->projects[3*vStart+2];
 		ve_x = modelPtr[curModelIdx]->projects[3*vEnd  ];
 		ve_y = modelPtr[curModelIdx]->projects[3*vEnd+1];
 		ve_z = modelPtr[curModelIdx]->projects[3*vEnd+2];
-		//cout << "connect v" << vStart << "(" << vs_x << "," << vs_y << "," << vs_z
-				//<< ")-v" << vEnd << "(" << ve_x << "," << ve_y << "," << ve_z << endl;
+		int dis_x = abs(vs_x-ve_x);
+		int dis_y = abs(vs_y-ve_y);
+		int dis_z = ve_z-vs_z;
+		cout << "vs_z: " << vs_z << "ve_z: " << ve_z << endl;
+		cout << "connect v" << vStart << "(" << vs_x << "," << vs_y << "," << vs_z
+				<< ")-v" << vEnd << "(" << ve_x << "," << ve_y << "," << ve_z << endl;
 		if (ve_x == vs_x)
 				for (int y = min(vs_y,ve_y)+1; y<max(vs_y,ve_y); y++)
-						framebuffer.draw(vs_x,y,vs_z,vec3(1.f));
+				{
+						if (dis_z == 0)
+								z = vs_z;
+						else
+						{
+								if (min(vs_y,ve_y)==vs_y )
+								{
+										//cout << vs_z << " " <<  float(dis_z) << " " << float(y-min(vs_y,ve_y)) / dis_y << " " << float(dis_z)* float(y-min(vs_y,ve_y)) / dis_y << endl;
+										z = vs_z + (float(dis_z) * float(y-min(vs_y,ve_y)) / dis_y );
+								}
+								else
+								{
+										//cout << ve_z << " " <<  float(dis_z) << " " << float(y-min(vs_y,ve_y)) / dis_y << " " << float(dis_z)* float(y-min(vs_y,ve_y)) / dis_y << endl;
+										z = ve_z - (float(dis_z) * float(y-min(vs_y,ve_y)) / dis_y );
+								}
+						}
+						cout << "z: " << z << endl;
+						framebuffer.draw(vs_x,y,z,vec3(z/300.f));
+				}
 		else
 		{
 				m = (float(ve_y-vs_y))/(float(ve_x-vs_x));
@@ -128,19 +150,30 @@ void DrawLine(int vStart, int vEnd)
 				//cout << "m: " << m << " b: " << b << endl;	
 				if (abs(m)<1)
 				{
-					 //cout << "m<1" << endl;
+					 cout << "m<1" << endl;
 					 int x = min(vs_x,ve_x)+1;
 					 float y;
 					 for ( x; x<max(vs_x,ve_x); x++)
 					 {
 							 y = m*x+b;
+							 if (dis_z == 0)
+									 z = vs_z;
+							 else
+							 {
+									 if (min(vs_x,ve_x) == vs_x)
+											 z = vs_z + dis_z * ( float(x-min(vs_x,ve_x)) / dis_x );
+									 else
+											 z = ve_z -dis_z * ( float(x-min(vs_x,ve_x)) / dis_x );
+							 }
+							 cout << "z: " << z << endl;
 							 //cout << "draw: (" << x << "," << int(y) << ")" << endl; 
-							 framebuffer.draw(x,int(y),vs_z,vec3(1.f));
+							 //cout << 1.f/f\loat(vs_z) << endl;
+							 framebuffer.draw(x,int(y),z,vec3(z/300.f));
 					 }
 				}
 				else
 				{
-						//cout << "m>1" << endl;
+						cout << "m>1" << endl;
 						int y = min(vs_y,ve_y)+1;
 						float x;
 						//cout << "y init: " << y << endl;
@@ -148,8 +181,25 @@ void DrawLine(int vStart, int vEnd)
 						{
 								//cout << "y: " << y << endl;
 								x = (float(y-b))/m;
-								//cout << "draw: (" << int(x) << "," << y << ")" << endl; 
-								framebuffer.draw(int(x),y,vs_z,vec3(1.f));
+								if (dis_z ==0 )
+										z = vs_z;
+								else
+								{
+										if (min(vs_y,ve_y)==vs_y)
+										{
+												//cout << vs_z << dis_z << float(y-min(vs_y,ve_y)) / dis_y << endl;
+												z = vs_z + (dis_z * ( float(y-min(vs_y,ve_y)) / dis_y ));
+										}
+										else
+										{
+												//cout << ve_z << dis_z << float(y-min(vs_y,ve_y)) / dis_y << endl;
+												z = ve_z - (dis_z * ( float(y-min(vs_y,ve_y)) / dis_y ));
+										}
+								}
+							  cout << "z: " << z << endl;
+							//cout << "draw: (" << int(x) << "," << y << ")" << endl; 
+								//cout << 1.f/float(vs_z) << endl;
+								framebuffer.draw(int(x),y,z,vec3(z/300.f));
 						}
 				}
 		}
@@ -162,7 +212,7 @@ void displayFunc()
 
 	/* draw point cloud */
 	/* TODO: change the following code to do rasterization */
-	int ix, iy, v0, v1, v2;
+	int ix, iy, iz, v0, v1, v2;
 	int screenSide = min(screenWidth, screenHeight);
 	float margin = 0.1f;
 	float prevX, prevY, prevZ, curX, curY, curZ;
@@ -183,12 +233,13 @@ void displayFunc()
 		// draw the framebuffer
 		ix = int(((1.f-margin)*curX)*screenSide) + screenWidth_half - 1;
 		iy = int(((1.f-margin)*curY)*screenSide) + screenHeight_half - 1;
+		iz = int(((1.f-margin)*curZ)*screenSide) + max(screenWidth,screenHeight)/2 - 1;
 		modelPtr[curModelIdx]->projects[3*i] = ix;
 		modelPtr[curModelIdx]->projects[3*i+1] = iy;
-		modelPtr[curModelIdx]->projects[3*i+2] = curZ;
-		cout << "ix: " << ix << " iy: " << iy << " curZ: " << curZ <<  endl;
-
-		framebuffer.draw(ix, iy, curZ, vec3(1.f));
+		modelPtr[curModelIdx]->projects[3*i+2] = iz;
+		cout << "ix: " << ix << " iy: " << iy << " iz: " << iz <<" iz/300: " << iz/300.f <<  endl;
+	  if (iz/300.f)
+		framebuffer.draw(ix, iy, curZ, vec3(iz/300));
 		}
 
 	for(int j=0; j<modelPtr[curModelIdx]->numTriangles; j++)
