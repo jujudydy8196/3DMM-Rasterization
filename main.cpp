@@ -119,9 +119,9 @@ void DrawLine(int vStart, int vEnd)
 		int dis_x = abs(vs_x-ve_x);
 		int dis_y = abs(vs_y-ve_y);
 		int dis_z = ve_z-vs_z;
-		cout << "vs_z: " << vs_z << "ve_z: " << ve_z << endl;
-		cout << "connect v" << vStart << "(" << vs_x << "," << vs_y << "," << vs_z
-				<< ")-v" << vEnd << "(" << ve_x << "," << ve_y << "," << ve_z << endl;
+		//cout << "vs_z: " << vs_z << "ve_z: " << ve_z << endl;
+		//cout << "connect v" << vStart << "(" << vs_x << "," << vs_y << "," << vs_z
+				//<< ")-v" << vEnd << "(" << ve_x << "," << ve_y << "," << ve_z << endl;
 		if (ve_x == vs_x)
 				for (int y = min(vs_y,ve_y)+1; y<max(vs_y,ve_y); y++)
 				{
@@ -140,8 +140,8 @@ void DrawLine(int vStart, int vEnd)
 										z = ve_z - (float(dis_z) * float(y-min(vs_y,ve_y)) / dis_y );
 								}
 						}
-						cout << "z: " << z << endl;
-						framebuffer.draw(vs_x,y,z,vec3(z/300.f));
+						//cout << "z: " << z << endl;
+						framebuffer.draw(vs_x,y,z,vec3(1.f-(z/670.f)));
 				}
 		else
 		{
@@ -150,7 +150,7 @@ void DrawLine(int vStart, int vEnd)
 				//cout << "m: " << m << " b: " << b << endl;	
 				if (abs(m)<1)
 				{
-					 cout << "m<1" << endl;
+					 //cout << "m<1" << endl;
 					 int x = min(vs_x,ve_x)+1;
 					 float y;
 					 for ( x; x<max(vs_x,ve_x); x++)
@@ -165,15 +165,15 @@ void DrawLine(int vStart, int vEnd)
 									 else
 											 z = ve_z -dis_z * ( float(x-min(vs_x,ve_x)) / dis_x );
 							 }
-							 cout << "z: " << z << endl;
+							 //cout << "z: " << z << endl;
 							 //cout << "draw: (" << x << "," << int(y) << ")" << endl; 
 							 //cout << 1.f/f\loat(vs_z) << endl;
-							 framebuffer.draw(x,int(y),z,vec3(z/300.f));
+							 framebuffer.draw(x,int(y),z,vec3(1.f-(z/670.f)));
 					 }
 				}
 				else
 				{
-						cout << "m>1" << endl;
+						//cout << "m>1" << endl;
 						int y = min(vs_y,ve_y)+1;
 						float x;
 						//cout << "y init: " << y << endl;
@@ -196,10 +196,10 @@ void DrawLine(int vStart, int vEnd)
 												z = ve_z - (dis_z * ( float(y-min(vs_y,ve_y)) / dis_y ));
 										}
 								}
-							  cout << "z: " << z << endl;
+								//cout << "z: " << z << endl;
 							//cout << "draw: (" << int(x) << "," << y << ")" << endl; 
 								//cout << 1.f/float(vs_z) << endl;
-								framebuffer.draw(int(x),y,z,vec3(z/300.f));
+								framebuffer.draw(int(x),y,z,vec3(1.f-(z/670.f)));
 						}
 				}
 		}
@@ -237,9 +237,9 @@ void displayFunc()
 		modelPtr[curModelIdx]->projects[3*i] = ix;
 		modelPtr[curModelIdx]->projects[3*i+1] = iy;
 		modelPtr[curModelIdx]->projects[3*i+2] = iz;
-		cout << "ix: " << ix << " iy: " << iy << " iz: " << iz <<" iz/300: " << iz/300.f <<  endl;
-	  if (iz/300.f)
-		framebuffer.draw(ix, iy, curZ, vec3(iz/300));
+		//cout << "ix: " << ix << " iy: " << iy << " iz: " << iz <<" iz/300: " << iz/670.f <<  endl;
+	  if (iz/670.f)
+			framebuffer.draw(ix, iy, curZ, vec3(1.f-(iz/670.f)));
 		}
 
 	for(int j=0; j<modelPtr[curModelIdx]->numTriangles; j++)
