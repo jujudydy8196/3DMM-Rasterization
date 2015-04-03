@@ -38,7 +38,7 @@ Framebuffer framebuffer(screenWidth, screenHeight);
 
 /* model names */
 const char* modelNames[] = {
-    "/Users/judy/Documents/senior/3DMM/3dmm_hw1/model/quad.obj"
+    "/Users/judy/Documents/senior/3DMM/3dmm_hw1/model/couch.obj"
 //	"model/quad.obj"
 //	"model/couch.obj",
 //	"model/blaze.obj",
@@ -299,38 +299,67 @@ void drawline(int vStart[3] , int vEnd[3])
 }
 void fillTopTriangle ( int sharp[3], int v1[3], int v2[3])
 {
-		float ms1 = float( sharp[0] - v1[0] ) / float( sharp[1]-v1[1]);
-		float ms2 = float( sharp[0] - v2[0] ) / float( sharp[1]-v2[1]);
-		int nowx1 = sharp[0];
-		int nowx2 = sharp[0];
+		//cout << " top " << sharp[0] << " " << sharp[1] << " " << v1[0] << " " << v1[1] << " " << v2[0] << " " << v2[1] <<  endl;
+		//float ms1 = float( sharp[0] - v1[0] ) / float( sharp[1]-v1[1]);
+		//float ms2 = float( sharp[0] - v2[0] ) / float( sharp[1]-v2[1]);
+		//int nowx1 = sharp[0];
+		//int nowx2 = sharp[0];
 
-		cout << "ms1: " << ms1 << " ms2: " << ms2 << endl;
+		float m1,m2,b1,b2;
+		m1 = float(sharp[1]-v1[1])/float(sharp[0]-v1[0]);
+		m2 = float(sharp[1]-v2[1])/float(sharp[0]-v2[0]);
+		b1 = float(v1[1]) - m1*(float)v1[0];
+		b2 = float(v2[1]) - m2*(float)v2[0];
+
+		//cout << "m1: " << m1 << " m2: " << m2 << " b1: " << b1 << " b2: " << b2 << endl;
+
+		//cout << "ms1: " << float(sharp[0]-v1[0]) << "/" << float(sharp[1]-v1[1]) <<" " << ms1
+				//<< " ms2: " << float(sharp[0]-v2[0]) << "/" << float(sharp[1]-v2[1]) <<" " << ms2 << endl;
 
 		for (int y = sharp[1]; y <= v1[1] ; y++ )
 		{
-				int L1[3] = {nowx1,y,sharp[2]+ int( (sharp[2]-v1[2]) * (y-sharp[1])/(v1[1]-sharp[1]))};
-				int L2[3] = {nowx2,y,sharp[2]+ int( (sharp[2]-v2[2]) * (y-sharp[1])/(v2[1]-sharp[1]))};
+			  int x1 = (sharp[0]-v1[0] == 0 ) ? sharp[0] : (int)((float)(y-b1)/m1);
+			  int x2 = (sharp[0]-v2[0] == 0 ) ? sharp[0] : (int)((float)(y-b2)/m2);
+				int L1[3] = {x1,y,sharp[2]+ int( (v1[2]-sharp[2]) * (y-sharp[1])/(v1[1]-sharp[1]))};
+				int L2[3] = {x2,y,sharp[2]+ int( (v2[2]-sharp[2]) * (y-sharp[1])/(v2[1]-sharp[1]))};
+				//cout << "L1: (" << L1[0] << "," << L1[1] << "," << L1[2] << ")" << endl;
+				//cout << "L2: (" << L2[0] << "," << L2[1] << "," << L2[2] << ")" << endl;
 				drawline(L1,L2);
 	
-				nowx1 = (int)(nowx1+ms1);
-				nowx2 = (int)(nowx2+ms2);
+				//nowx1 = (roundf)(nowx1+ms1);
+				//nowx2 = (roundf)(nowx2+ms2);
 		}
 }
 void fillBottomTriangle( int sharp[3], int v1[3], int v2[3])
 {
-		float ms1 = float( sharp[0] - v1[0] ) / float( sharp[1]-v1[1]);
-		float ms2 = float( sharp[0] - v2[0] ) / float( sharp[1]-v2[1]);
-		int nowx1 = sharp[0];
-		int nowx2 = sharp[0];
+		//cout << " Botton! " << endl;
+		//float ms1 = float( sharp[0] - v1[0] ) / float( sharp[1]-v1[1]);
+		//float ms2 = float( sharp[0] - v2[0] ) / float( sharp[1]-v2[1]);
+		//int nowx1 = sharp[0];
+		//int nowx2 = sharp[0];
 
-		cout << "ms1: " << ms1 << " ms2: " << ms2 << endl;
+		//cout << "ms1: " << ms1 << " ms2: " << ms2 << endl;
+		float m1,m2,b1,b2;
+		m1 = float(sharp[1]-v1[1])/float(sharp[0]-v1[0]);
+		m2 = float(sharp[1]-v2[1])/float(sharp[0]-v2[0]);
+		b1 = float(v1[1]) - m1*(float)v1[0];
+		b2 = float(v2[1]) - m2*(float)v2[0];
+
+		cout << "m1: " << m1 << " m2: " << m2 << " b1: " << b1 << " b2: " << b2 << endl;
+
 		for (int y = sharp[1]; y >= v1[1] ; y-- )
 		{
-				int L1[3] = {nowx1,y,sharp[2]+ int( (sharp[2]-v1[2]) * (y-sharp[1])/(v1[1]-sharp[1]))};
-				int L2[3] = {nowx2,y,sharp[2]+ int( (sharp[2]-v2[2]) * (y-sharp[1])/(v2[1]-sharp[1]))};
+			  int x1 = (sharp[0]-v1[0] == 0 ) ? sharp[0] : (int)((float)(y-b1)/m1);
+			  int x2 = (sharp[0]-v2[0] == 0 ) ? sharp[0] : (int)((float)(y-b2)/m2);
+
+				int L1[3] = {x1,y,sharp[2]+ int( (v1[2]-sharp[2]) * (y-sharp[1])/(v1[1]-sharp[1]))};
+				int L2[3] = {x2,y,sharp[2]+ int( (v2[2]-sharp[2]) * (y-sharp[1])/(v2[1]-sharp[1]))};
+				//cout << "L1: (" << L1[0] << "," << L1[1] << "," << L1[2] << ")" << endl;
+				//cout << "L2: (" << L2[0] << "," << L2[1] << "," << L2[2] << ")" << endl;
+
 				drawline(L1,L2);
-				nowx1 = (int)(nowx1-ms1);
-				nowx2 = (int)(nowx2-ms2);
+				//nowx1 = (roundf)(nowx1-ms1);
+				//nowx2 = (roundf)(nowx2-ms2);
 		}
 
 }
@@ -369,10 +398,11 @@ void fillTriangles ( Triangle* t )
 				ysorted[2] = (v[1][1] < v[0][1])? 1:0;
 		}
 
-		cout << v[0][1] << " " << v[1][1] << " " << v[2][1] << endl;
-		for (int i=0; i<3;i++)
-				cout << ysorted[i] << " " ;
-		cout << endl;
+		//cout << v[0][1] << " " << v[1][1] << " " << v[2][1] << endl;
+		//cout << "ysorted index: " ;
+		//for (int i=0; i<3;i++)
+				//cout << ysorted[i] << " " ;
+		//cout << endl;
 
 		if (v[ysorted[1]][1] == v[ysorted[2]][1] )
 				fillBottomTriangle(v[ysorted[0]],v[ysorted[1]],v[ysorted[2]]);
@@ -381,6 +411,7 @@ void fillTriangles ( Triangle* t )
 		else
 		{
 				int v4[3] = { (int)(v[ysorted[0]][0] + ((float)(v[ysorted[1]][1] - v[ysorted[0]][1]) / (float)( v[ysorted[2]][1] - v[ysorted[0]][1] )) * ( v[ysorted[2]][0] - v[ysorted[0]][0])) , v[ysorted[1]][1] , (int)(v[ysorted[0]][2] + ((float)(v[ysorted[1]][1] - v[ysorted[0]][1]) / (float)( v[ysorted[2]][1] - v[ysorted[0]][1] )) * ( v[ysorted[2]][2] - v[ysorted[0]][2]))};
+				//cout << "v4: " << v4[0] << " " << v4[1] << " " << v4[2] << endl; 
 				fillBottomTriangle(v[ysorted[0]],v[ysorted[1]],v4);
 				fillTopTriangle(v[ysorted[2]],v[ysorted[1]],v4);
 		}
@@ -418,7 +449,7 @@ void displayFunc()
 		modelPtr[curModelIdx]->projects[3*i] = ix;
 		modelPtr[curModelIdx]->projects[3*i+1] = iy;
 		modelPtr[curModelIdx]->projects[3*i+2] = iz;
-		cout << "ix: " << ix << " iy: " << iy << " iz: " << iz <<" iz/300: " << iz/670.f <<  endl;
+		//cout << "ix: " << ix << " iy: " << iy << " iz: " << iz <<" iz/300: " << iz/670.f <<  endl;
 	  if (iz/670.f)
 			framebuffer.draw(ix, iy, curZ, vec3(1.f-(iz/670.f)));
 		}
