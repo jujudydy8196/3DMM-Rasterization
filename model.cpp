@@ -120,15 +120,15 @@ void readObjSecondPass(Model* model, ifstream& ifs)
 					triangles[tIdx].nIndices[1] = n1;
 					triangles[tIdx].nIndices[2] = n2;
 				}
-				else if(sscanf(buf, "%d/%d/%d", &v0, &t0, &n0)) {//	[> v/t/n <]
-					sscanf(buf, "%d/%d/%d %d/%d/%d %d/%d/%d", &v0, &t0, &n0, &v1, &t1, &n1, &v2, &t2, &n2);
-					triangles[tIdx].vIndices[0] = v0;
-					triangles[tIdx].vIndices[1] = v1;
-					triangles[tIdx].vIndices[2] = v2;
-					triangles[tIdx].nIndices[0] = n0;
-					triangles[tIdx].nIndices[1] = n1;
-					triangles[tIdx].nIndices[2] = n2;
-				}
+				//else if(sscanf(buf, "%d/%d/%d", &v0, &t0, &n0)) {//	[> v/t/n <]
+					//sscanf(buf, "%d/%d/%d %d/%d/%d %d/%d/%d", &v0, &t0, &n0, &v1, &t1, &n1, &v2, &t2, &n2);
+					//triangles[tIdx].vIndices[0] = v0;
+					//triangles[tIdx].vIndices[1] = v1;
+					//triangles[tIdx].vIndices[2] = v2;
+					//triangles[tIdx].nIndices[0] = n0;
+					//triangles[tIdx].nIndices[1] = n1;
+					//triangles[tIdx].nIndices[2] = n2;
+				//}
 				else if(sscanf(buf, "%d/%d", &v0, &t0)) {	/* v/t */
 					sscanf(buf, "%d/%d %d/%d %d/%d", &v0, &t0, &v1, &t1, &v2, &t2);
 					triangles[tIdx].vIndices[0] = v0;
@@ -179,6 +179,7 @@ Model* readObj(const string filename)
 	ifs.open(filename.c_str(), ios::in);
 	// ifs.seekg(ifs.beg);
 	model->numNormals--;
+	model->numTriangles--;
 	readObjSecondPass(model, ifs);
 	
 	ifs.close();

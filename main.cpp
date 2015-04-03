@@ -106,6 +106,7 @@ void init()
 	curModelIdx = 0;
 	culling = true;
 }
+
 void DrawLine(int vStart, int vEnd)
 {
 		int vs_x,vs_y,vs_z,ve_x,ve_y,ve_z;
@@ -203,6 +204,186 @@ void DrawLine(int vStart, int vEnd)
 						}
 				}
 		}
+}
+
+void drawline(int vStart[3] , int vEnd[3])
+{
+		float m,b,z;
+		int dis_x = abs(vStart[0]-vEnd[0]);
+		int dis_y = abs(vStart[1]-vEnd[1]);
+		int dis_z = vEnd[2]-vStart[2];
+		//cout << "vs_z: " << vs_z << "ve_z: " << ve_z << endl;
+		//cout << "connect v" <<  "(" << vStart[0] << "," << vStart[1] << "," << vStart[2] 
+				//<< ")-v(" << vEnd[0] << "," << vEnd[1] << "," << vEnd[2] << endl;
+		if (vEnd[0] == vStart[0])
+				for (int y = min(vStart[1],vEnd[1])+1; y<=max(vStart[1],vEnd[1]); y++)
+				{
+						if (dis_z == 0)
+								z = vStart[2];
+						else
+						{
+								if (min(vStart[1],vEnd[1])==vStart[1] )
+								{
+										//cout << vs_z << " " <<  float(dis_z) << " " << float(y-min(vs_y,ve_y)) / dis_y << " " << float(dis_z)* float(y-min(vs_y,ve_y)) / dis_y << endl;
+										z = vStart[2] + (float(dis_z) * float(y-min(vStart[1],vEnd[1])) / dis_y );
+								}
+								else
+								{
+										//cout << ve_z << " " <<  float(dis_z) << " " << float(y-min(vs_y,ve_y)) / dis_y << " " << float(dis_z)* float(y-min(vs_y,ve_y)) / dis_y << endl;
+										z = vEnd[2] - (float(dis_z) * float(y-min(vStart[1],vEnd[1])) / dis_y );
+								}
+						}
+						//cout << "z: " << z << endl;
+						framebuffer.draw(vStart[0],y,z,vec3(1.f-(z/670.f)));
+				}
+		else
+		{
+				m = (float(vEnd[1]-vStart[1]))/(float(vEnd[0]-vStart[0]));
+				b = vStart[1] - (m*vStart[0]);
+				//cout << "m: " << m << " b: " << b << endl;	
+				if (abs(m)<1)
+				{
+					 //cout << "m<1" << endl;
+					 int x = min(vStart[0],vEnd[0])+1;
+					 float y;
+					 for ( x; x<=max(vStart[0],vEnd[0]); x++)
+					 {
+							 y = m*x+b;
+							 if (dis_z == 0)
+									 z = vStart[2];
+							 else
+							 {
+									 if (min(vStart[0],vEnd[0]) == vStart[0])
+											 z = vStart[2] + dis_z * ( float(x-min(vStart[0],vEnd[0])) / dis_x );
+									 else
+											 z = vEnd[2] -dis_z * ( float(x-min(vStart[0],vEnd[0])) / dis_x );
+							 }
+							 //cout << "z: " << z << endl;
+							 //cout << "draw: (" << x << "," << int(y) << ")" << endl; 
+							 //cout << 1.f/f\loat(vs_z) << endl;
+							 framebuffer.draw(x,int(y),z,vec3(1.f-(z/670.f)));
+					 }
+				}
+				else
+				{
+						//cout << "m>1" << endl;
+						int y = min(vStart[1],vEnd[1])+1;
+						float x;
+						//cout << "y init: " << y << endl;
+						for (y; y<=max(vStart[1],vEnd[1]); y++)
+						{
+								//cout << "y: " << y << endl;
+								x = (float(y-b))/m;
+								if (dis_z ==0 )
+										z = vStart[2];
+								else
+								{
+										if (min(vEnd[1],vStart[1])==vStart[1])
+										{
+												//cout << vs_z << dis_z << float(y-min(vs_y,ve_y)) / dis_y << endl;
+												z = vStart[2] + (dis_z * ( float(y-min(vStart[1],vEnd[1])) / dis_y ));
+										}
+										else
+										{
+												//cout << ve_z << dis_z << float(y-min(vs_y,ve_y)) / dis_y << endl;
+												z = vEnd[2] - (dis_z * ( float(y-min(vStart[1],vEnd[1])) / dis_y ));
+										}
+								}
+								//cout << "z: " << z << endl;
+							//cout << "draw: (" << int(x) << "," << y << ")" << endl; 
+								//cout << 1.f/float(vs_z) << endl;
+								framebuffer.draw(int(x),y,z,vec3(1.f-(z/670.f)));
+						}
+				}
+		}
+}
+void fillTopTriangle ( int sharp[3], int v1[3], int v2[3])
+{
+		float ms1 = float( sharp[0] - v1[0] ) / float( sharp[1]-v1[1]);
+		float ms2 = float( sharp[0] - v2[0] ) / float( sharp[1]-v2[1]);
+		int nowx1 = sharp[0];
+		int nowx2 = sharp[0];
+
+		cout << "ms1: " << ms1 << " ms2: " << ms2 << endl;
+
+		for (int y = sharp[1]; y <= v1[1] ; y++ )
+		{
+				int L1[3] = {nowx1,y,sharp[2]+ int( (sharp[2]-v1[2]) * (y-sharp[1])/(v1[1]-sharp[1]))};
+				int L2[3] = {nowx2,y,sharp[2]+ int( (sharp[2]-v2[2]) * (y-sharp[1])/(v2[1]-sharp[1]))};
+				drawline(L1,L2);
+	
+				nowx1 = (int)(nowx1+ms1);
+				nowx2 = (int)(nowx2+ms2);
+		}
+}
+void fillBottomTriangle( int sharp[3], int v1[3], int v2[3])
+{
+		float ms1 = float( sharp[0] - v1[0] ) / float( sharp[1]-v1[1]);
+		float ms2 = float( sharp[0] - v2[0] ) / float( sharp[1]-v2[1]);
+		int nowx1 = sharp[0];
+		int nowx2 = sharp[0];
+
+		cout << "ms1: " << ms1 << " ms2: " << ms2 << endl;
+		for (int y = sharp[1]; y >= v1[1] ; y-- )
+		{
+				int L1[3] = {nowx1,y,sharp[2]+ int( (sharp[2]-v1[2]) * (y-sharp[1])/(v1[1]-sharp[1]))};
+				int L2[3] = {nowx2,y,sharp[2]+ int( (sharp[2]-v2[2]) * (y-sharp[1])/(v2[1]-sharp[1]))};
+				drawline(L1,L2);
+				nowx1 = (int)(nowx1-ms1);
+				nowx2 = (int)(nowx2-ms2);
+		}
+
+}
+void fillTriangles ( Triangle* t )
+{
+		int vv0,vv1,vv2;
+		vv0 = t->vIndices[0];
+		vv1 = t->vIndices[1];
+		vv2 = t->vIndices[2];
+
+		cout << "vv0: " << vv0 << " vv1: " << vv1 << " vv2: " << vv2 << endl;
+
+		int v[3][3] = {
+				{ modelPtr[curModelIdx]->projects[3*vv0], modelPtr[curModelIdx]->projects[3*vv0+1],modelPtr[curModelIdx]->projects[3*vv0+2]},
+				{ modelPtr[curModelIdx]->projects[3*vv1], modelPtr[curModelIdx]->projects[3*vv1+1],modelPtr[curModelIdx]->projects[3*vv1+2]},
+				{ modelPtr[curModelIdx]->projects[3*vv2], modelPtr[curModelIdx]->projects[3*vv2+1],modelPtr[curModelIdx]->projects[3*vv2+2]} };
+
+		int ymax = max(v[0][1],max(v[1][1],v[2][1]));
+		int ysorted[3];
+		if (ymax == v[0][1])
+		{
+				ysorted[0] =0;
+				ysorted[1] = (v[1][1] >= v[2][1])? 1 : 2;
+				ysorted[2] = (v[1][1] < v[2][1])? 1 : 2;
+		}
+		else if (ymax == v[1][1])
+		{
+				ysorted[0] =1;
+				ysorted[1] = (v[0][1] >= v[2][1])? 0 : 2;
+				ysorted[2] = (v[0][1] < v[2][1])? 0 : 2;
+		}
+		else
+		{
+				ysorted[0] =2;
+				ysorted[1] = (v[1][1] >= v[0][1])? 1:0;
+				ysorted[2] = (v[1][1] < v[0][1])? 1:0;
+		}
+
+		cout << v[0][1] << " " << v[1][1] << " " << v[2][1] << endl;
+		for (int i=0; i<3;i++)
+				cout << ysorted[i] << " " ;
+		cout << endl;
+
+		if (v[ysorted[1]][1] == v[ysorted[2]][1] )
+				fillBottomTriangle(v[ysorted[0]],v[ysorted[1]],v[ysorted[2]]);
+		else if (v[ysorted[0]][1] == v[ysorted[1]][1])
+				fillTopTriangle(v[ysorted[2]],v[ysorted[0]],v[ysorted[1]]);
+		else
+		{
+				int v4[3] = { (int)(v[ysorted[0]][0] + ((float)(v[ysorted[1]][1] - v[ysorted[0]][1]) / (float)( v[ysorted[2]][1] - v[ysorted[0]][1] )) * ( v[ysorted[2]][0] - v[ysorted[0]][0])) , v[ysorted[1]][1] , (int)(v[ysorted[0]][2] + ((float)(v[ysorted[1]][1] - v[ysorted[0]][1]) / (float)( v[ysorted[2]][1] - v[ysorted[0]][1] )) * ( v[ysorted[2]][2] - v[ysorted[0]][2]))};
+				fillBottomTriangle(v[ysorted[0]],v[ysorted[1]],v4);
+				fillTopTriangle(v[ysorted[2]],v[ysorted[1]],v4);
+		}
 
 }
 
@@ -237,23 +418,27 @@ void displayFunc()
 		modelPtr[curModelIdx]->projects[3*i] = ix;
 		modelPtr[curModelIdx]->projects[3*i+1] = iy;
 		modelPtr[curModelIdx]->projects[3*i+2] = iz;
-		//cout << "ix: " << ix << " iy: " << iy << " iz: " << iz <<" iz/300: " << iz/670.f <<  endl;
+		cout << "ix: " << ix << " iy: " << iy << " iz: " << iz <<" iz/300: " << iz/670.f <<  endl;
 	  if (iz/670.f)
 			framebuffer.draw(ix, iy, curZ, vec3(1.f-(iz/670.f)));
 		}
 
-	for(int j=0; j<modelPtr[curModelIdx]->numTriangles; j++)
-	{
-		v0 = modelPtr[curModelIdx]->triangles[j].vIndices[0];
-		v1 = modelPtr[curModelIdx]->triangles[j].vIndices[1]; 
-		v2 = modelPtr[curModelIdx]->triangles[j].vIndices[2]; 
+	//for(int j=0; j<modelPtr[curModelIdx]->numTriangles; j++)
+	//{
+		//v0 = modelPtr[curModelIdx]->triangles[j].vIndices[0];
+		//v1 = modelPtr[curModelIdx]->triangles[j].vIndices[1]; 
+		//v2 = modelPtr[curModelIdx]->triangles[j].vIndices[2]; 
 		//cout << "triangles index: " << v0 << " " << v1 << " " << v2 << endl;
 	
-		DrawLine(v0,v1);
-		DrawLine(v1,v2);
-		DrawLine(v2,v0);
+		//DrawLine(v0,v1);
+		//DrawLine(v1,v2);
+		//DrawLine(v2,v0);
 
-	}
+	//}
+	
+
+	for(int j=0; j<modelPtr[curModelIdx]->numTriangles;j++)
+			fillTriangles(&modelPtr[curModelIdx]->triangles[j]);
 
 
     /* display */
