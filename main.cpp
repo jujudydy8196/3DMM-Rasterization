@@ -38,7 +38,7 @@ Framebuffer framebuffer(screenWidth, screenHeight);
 
 /* model names */
 const char* modelNames[] = {
-    "/Users/judy/Documents/senior/3DMM/3dmm_hw1/model/couch.obj"
+    "/Users/judy/Documents/senior/3DMM/3dmm_hw1/model/duck4KN.obj"
 //	"model/quad.obj"
 //	"model/couch.obj",
 //	"model/blaze.obj",
@@ -124,7 +124,7 @@ void DrawLine(int vStart, int vEnd)
 		//cout << "connect v" << vStart << "(" << vs_x << "," << vs_y << "," << vs_z
 				//<< ")-v" << vEnd << "(" << ve_x << "," << ve_y << "," << ve_z << endl;
 		if (ve_x == vs_x)
-				for (int y = min(vs_y,ve_y)+1; y<max(vs_y,ve_y); y++)
+				for (int y = min(vs_y,ve_y); y<=max(vs_y,ve_y); y++)
 				{
 						if (dis_z == 0)
 								z = vs_z;
@@ -152,9 +152,9 @@ void DrawLine(int vStart, int vEnd)
 				if (abs(m)<1)
 				{
 					 //cout << "m<1" << endl;
-					 int x = min(vs_x,ve_x)+1;
+					 int x = min(vs_x,ve_x);//+1;
 					 float y;
-					 for ( x; x<max(vs_x,ve_x); x++)
+					 for ( x; x<=max(vs_x,ve_x); x++)
 					 {
 							 y = m*x+b;
 							 if (dis_z == 0)
@@ -175,10 +175,10 @@ void DrawLine(int vStart, int vEnd)
 				else
 				{
 						//cout << "m>1" << endl;
-						int y = min(vs_y,ve_y)+1;
+						int y = min(vs_y,ve_y);//+1;
 						float x;
 						//cout << "y init: " << y << endl;
-						for (y; y<max(ve_y,vs_y); y++)
+						for (y; y<=max(ve_y,vs_y); y++)
 						{
 								//cout << "y: " << y << endl;
 								x = (float(y-b))/m;
@@ -216,7 +216,7 @@ void drawline(int vStart[3] , int vEnd[3])
 		//cout << "connect v" <<  "(" << vStart[0] << "," << vStart[1] << "," << vStart[2] 
 				//<< ")-v(" << vEnd[0] << "," << vEnd[1] << "," << vEnd[2] << endl;
 		if (vEnd[0] == vStart[0])
-				for (int y = min(vStart[1],vEnd[1])+1; y<=max(vStart[1],vEnd[1]); y++)
+				for (int y = min(vStart[1],vEnd[1]); y<=max(vStart[1],vEnd[1]); y++)
 				{
 						if (dis_z == 0)
 								z = vStart[2];
@@ -244,7 +244,7 @@ void drawline(int vStart[3] , int vEnd[3])
 				if (abs(m)<1)
 				{
 					 //cout << "m<1" << endl;
-					 int x = min(vStart[0],vEnd[0])+1;
+					 int x = min(vStart[0],vEnd[0]);//+1;
 					 float y;
 					 for ( x; x<=max(vStart[0],vEnd[0]); x++)
 					 {
@@ -267,7 +267,7 @@ void drawline(int vStart[3] , int vEnd[3])
 				else
 				{
 						//cout << "m>1" << endl;
-						int y = min(vStart[1],vEnd[1])+1;
+						int y = min(vStart[1],vEnd[1]);//+1;
 						float x;
 						//cout << "y init: " << y << endl;
 						for (y; y<=max(vStart[1],vEnd[1]); y++)
@@ -338,14 +338,16 @@ void fillBottomTriangle( int sharp[3], int v1[3], int v2[3])
 		//int nowx1 = sharp[0];
 		//int nowx2 = sharp[0];
 
+		//cout << "(" << sharp[0] << "," << sharp[1] << ")   (" << v1[0] << "," << v1[1] << ")   ("<< v2[0] << "," << v2[1] << ")" << endl;
+
 		//cout << "ms1: " << ms1 << " ms2: " << ms2 << endl;
 		float m1,m2,b1,b2;
 		m1 = float(sharp[1]-v1[1])/float(sharp[0]-v1[0]);
 		m2 = float(sharp[1]-v2[1])/float(sharp[0]-v2[0]);
 		b1 = float(v1[1]) - m1*(float)v1[0];
 		b2 = float(v2[1]) - m2*(float)v2[0];
+		//cout << "m1: " << m1 << " m2: " << m2 << " b1: " << b1 << " b2: " << b2 << endl;
 
-		cout << "m1: " << m1 << " m2: " << m2 << " b1: " << b1 << " b2: " << b2 << endl;
 
 		for (int y = sharp[1]; y >= v1[1] ; y-- )
 		{
@@ -370,7 +372,7 @@ void fillTriangles ( Triangle* t )
 		vv1 = t->vIndices[1];
 		vv2 = t->vIndices[2];
 
-		cout << "vv0: " << vv0 << " vv1: " << vv1 << " vv2: " << vv2 << endl;
+		//cout << "vv0: " << vv0 << " vv1: " << vv1 << " vv2: " << vv2 << endl;
 
 		int v[3][3] = {
 				{ modelPtr[curModelIdx]->projects[3*vv0], modelPtr[curModelIdx]->projects[3*vv0+1],modelPtr[curModelIdx]->projects[3*vv0+2]},
@@ -403,17 +405,23 @@ void fillTriangles ( Triangle* t )
 		//for (int i=0; i<3;i++)
 				//cout << ysorted[i] << " " ;
 		//cout << endl;
-
-		if (v[ysorted[1]][1] == v[ysorted[2]][1] )
-				fillBottomTriangle(v[ysorted[0]],v[ysorted[1]],v[ysorted[2]]);
-		else if (v[ysorted[0]][1] == v[ysorted[1]][1])
-				fillTopTriangle(v[ysorted[2]],v[ysorted[0]],v[ysorted[1]]);
-		else
-		{
-				int v4[3] = { (int)(v[ysorted[0]][0] + ((float)(v[ysorted[1]][1] - v[ysorted[0]][1]) / (float)( v[ysorted[2]][1] - v[ysorted[0]][1] )) * ( v[ysorted[2]][0] - v[ysorted[0]][0])) , v[ysorted[1]][1] , (int)(v[ysorted[0]][2] + ((float)(v[ysorted[1]][1] - v[ysorted[0]][1]) / (float)( v[ysorted[2]][1] - v[ysorted[0]][1] )) * ( v[ysorted[2]][2] - v[ysorted[0]][2]))};
-				//cout << "v4: " << v4[0] << " " << v4[1] << " " << v4[2] << endl; 
-				fillBottomTriangle(v[ysorted[0]],v[ysorted[1]],v4);
-				fillTopTriangle(v[ysorted[2]],v[ysorted[1]],v4);
+				DrawLine(vv0,vv1);
+				DrawLine(vv1,vv2);
+				DrawLine(vv2,vv0);
+	
+		if (v[ysorted[0]][1] != v[ysorted[2]][1] )
+		{	
+				if (v[ysorted[1]][1] == v[ysorted[2]][1] )
+						fillBottomTriangle(v[ysorted[0]],v[ysorted[1]],v[ysorted[2]]);
+				else if (v[ysorted[0]][1] == v[ysorted[1]][1])
+						fillTopTriangle(v[ysorted[2]],v[ysorted[0]],v[ysorted[1]]);
+				else
+				{
+						int v4[3] = { (int)(v[ysorted[0]][0] + ((float)(v[ysorted[1]][1] - v[ysorted[0]][1]) / (float)( v[ysorted[2]][1] - v[ysorted[0]][1] )) * ( v[ysorted[2]][0] - v[ysorted[0]][0])) , v[ysorted[1]][1] , (int)(v[ysorted[0]][2] + ((float)(v[ysorted[1]][1] - v[ysorted[0]][1]) / (float)( v[ysorted[2]][1] - v[ysorted[0]][1] )) * ( v[ysorted[2]][2] - v[ysorted[0]][2]))};
+						//cout << "v4: " << v4[0] << " " << v4[1] << " " << v4[2] << endl; 
+						fillBottomTriangle(v[ysorted[0]],v[ysorted[1]],v4);
+						fillTopTriangle(v[ysorted[2]],v[ysorted[1]],v4);
+				}
 		}
 
 }
