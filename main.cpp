@@ -18,7 +18,7 @@
 using namespace std;
 
 #define PI 3.14159265
-
+#define ROUND(x) (int)(x+0.5)
 Model** modelPtr;
 
 /* frame size */
@@ -261,7 +261,7 @@ void drawline(int vStart[3] , int vEnd[3])
 							 //cout << "z: " << z << endl;
 							 //cout << "draw: (" << x << "," << int(y) << ")" << endl; 
 							 //cout << 1.f/f\loat(vs_z) << endl;
-							 framebuffer.draw(x,int(y),z,vec3(1.f-(z/670.f)));
+							 framebuffer.draw(x,ROUND(y),z,vec3(1.f-(z/670.f)));
 					 }
 				}
 				else
@@ -292,7 +292,7 @@ void drawline(int vStart[3] , int vEnd[3])
 								//cout << "z: " << z << endl;
 							//cout << "draw: (" << int(x) << "," << y << ")" << endl; 
 								//cout << 1.f/float(vs_z) << endl;
-								framebuffer.draw(int(x),y,z,vec3(1.f-(z/670.f)));
+								framebuffer.draw(ROUND(x),y,z,vec3(1.f-(z/670.f)));
 						}
 				}
 		}
@@ -318,10 +318,10 @@ void fillTopTriangle ( int sharp[3], int v1[3], int v2[3])
 
 		for (int y = sharp[1]; y <= v1[1] ; y++ )
 		{
-			  int x1 = (sharp[0]-v1[0] == 0 ) ? sharp[0] : (int)((float)(y-b1)/m1);
-			  int x2 = (sharp[0]-v2[0] == 0 ) ? sharp[0] : (int)((float)(y-b2)/m2);
-				int L1[3] = {x1,y,sharp[2]+ int( (v1[2]-sharp[2]) * (y-sharp[1])/(v1[1]-sharp[1]))};
-				int L2[3] = {x2,y,sharp[2]+ int( (v2[2]-sharp[2]) * (y-sharp[1])/(v2[1]-sharp[1]))};
+			  int x1 = (sharp[0]-v1[0] == 0 ) ? sharp[0] : ROUND((float)(y-b1)/m1);
+			  int x2 = (sharp[0]-v2[0] == 0 ) ? sharp[0] : ROUND((float)(y-b2)/m2);
+				int L1[3] = {x1,y,sharp[2]+ ROUND( (v1[2]-sharp[2]) * (y-sharp[1])/(v1[1]-sharp[1]))};
+				int L2[3] = {x2,y,sharp[2]+ ROUND( (v2[2]-sharp[2]) * (y-sharp[1])/(v2[1]-sharp[1]))};
 				//cout << "L1: (" << L1[0] << "," << L1[1] << "," << L1[2] << ")" << endl;
 				//cout << "L2: (" << L2[0] << "," << L2[1] << "," << L2[2] << ")" << endl;
 				drawline(L1,L2);
@@ -351,11 +351,11 @@ void fillBottomTriangle( int sharp[3], int v1[3], int v2[3])
 
 		for (int y = sharp[1]; y >= v1[1] ; y-- )
 		{
-			  int x1 = (sharp[0]-v1[0] == 0 ) ? sharp[0] : (int)((float)(y-b1)/m1);
-			  int x2 = (sharp[0]-v2[0] == 0 ) ? sharp[0] : (int)((float)(y-b2)/m2);
+			  int x1 = (sharp[0]-v1[0] == 0 ) ? sharp[0] : ROUND((float)(y-b1)/m1);
+			  int x2 = (sharp[0]-v2[0] == 0 ) ? sharp[0] : ROUND((float)(y-b2)/m2);
 
-				int L1[3] = {x1,y,sharp[2]+ int( (v1[2]-sharp[2]) * (y-sharp[1])/(v1[1]-sharp[1]))};
-				int L2[3] = {x2,y,sharp[2]+ int( (v2[2]-sharp[2]) * (y-sharp[1])/(v2[1]-sharp[1]))};
+				int L1[3] = {x1,y,sharp[2]+ ROUND( (v1[2]-sharp[2]) * (y-sharp[1])/(v1[1]-sharp[1]))};
+				int L2[3] = {x2,y,sharp[2]+ ROUND( (v2[2]-sharp[2]) * (y-sharp[1])/(v2[1]-sharp[1]))};
 				//cout << "L1: (" << L1[0] << "," << L1[1] << "," << L1[2] << ")" << endl;
 				//cout << "L2: (" << L2[0] << "," << L2[1] << "," << L2[2] << ")" << endl;
 
@@ -379,6 +379,20 @@ void fillTriangles ( Triangle* t )
 				{ modelPtr[curModelIdx]->projects[3*vv1], modelPtr[curModelIdx]->projects[3*vv1+1],modelPtr[curModelIdx]->projects[3*vv1+2]},
 				{ modelPtr[curModelIdx]->projects[3*vv2], modelPtr[curModelIdx]->projects[3*vv2+1],modelPtr[curModelIdx]->projects[3*vv2+2]} };
 
+		int vec1[3] = {v[1][0]-v[0][0],v[1][1]-v[0][1],v[1][2]-v[0][2]};
+		int vec2[3] = {v[2][0]-v[0][0],v[2][1]-v[0][1],v[2][2]-v[0][2]};
+		//for back culling
+		t->faceNormal[0] = (vec1[1]*vec2[2])-(vec1[2]*vec2[1]);
+		t->faceNormal[1] = (vec1[2]*vec2[0])-(vec1[0]*vec2[2]);
+		t->faceNormal[2] = (vec1[0]*vec2[1])-(vec1[1]*vec2[0]);
+
+		int dotProduct = v[0][0]*(t->faceNormal[0]) + v[0][1]*(t->faceNormal[1]) + v[0][2]*(t->faceNormal[2]);
+		cout << "dotProduct: " << dotProduct << endl;
+		//if ( dotProduct < 0 )
+		//{
+				//cout << "no display" << endl;
+				//return;
+		//}
 		int ymax = max(v[0][1],max(v[1][1],v[2][1]));
 		int ysorted[3];
 		if (ymax == v[0][1])
@@ -417,7 +431,7 @@ void fillTriangles ( Triangle* t )
 						fillTopTriangle(v[ysorted[2]],v[ysorted[0]],v[ysorted[1]]);
 				else
 				{
-						int v4[3] = { (int)(v[ysorted[0]][0] + ((float)(v[ysorted[1]][1] - v[ysorted[0]][1]) / (float)( v[ysorted[2]][1] - v[ysorted[0]][1] )) * ( v[ysorted[2]][0] - v[ysorted[0]][0])) , v[ysorted[1]][1] , (int)(v[ysorted[0]][2] + ((float)(v[ysorted[1]][1] - v[ysorted[0]][1]) / (float)( v[ysorted[2]][1] - v[ysorted[0]][1] )) * ( v[ysorted[2]][2] - v[ysorted[0]][2]))};
+						int v4[3] = { ROUND(v[ysorted[0]][0] + ((float)(v[ysorted[1]][1] - v[ysorted[0]][1]) / (float)( v[ysorted[2]][1] - v[ysorted[0]][1] )) * ( v[ysorted[2]][0] - v[ysorted[0]][0])) , v[ysorted[1]][1] , ROUND(v[ysorted[0]][2] + ((float)(v[ysorted[1]][1] - v[ysorted[0]][1]) / (float)( v[ysorted[2]][1] - v[ysorted[0]][1] )) * ( v[ysorted[2]][2] - v[ysorted[0]][2]))};
 						//cout << "v4: " << v4[0] << " " << v4[1] << " " << v4[2] << endl; 
 						fillBottomTriangle(v[ysorted[0]],v[ysorted[1]],v4);
 						fillTopTriangle(v[ysorted[2]],v[ysorted[1]],v4);
@@ -458,8 +472,8 @@ void displayFunc()
 		modelPtr[curModelIdx]->projects[3*i+1] = iy;
 		modelPtr[curModelIdx]->projects[3*i+2] = iz;
 		//cout << "ix: " << ix << " iy: " << iy << " iz: " << iz <<" iz/300: " << iz/670.f <<  endl;
-	  if (iz/670.f)
-			framebuffer.draw(ix, iy, curZ, vec3(1.f-(iz/670.f)));
+		//if (iz/670.f)
+			//framebuffer.draw(ix, iy, curZ, vec3(1.f-(iz/670.f)));
 		}
 
 	//for(int j=0; j<modelPtr[curModelIdx]->numTriangles; j++)

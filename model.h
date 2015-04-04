@@ -7,6 +7,7 @@ using namespace std;
 class Triangle {
 public:
 	Triangle() {
+		faceNormal = new int[3];
 		vIndices = new int[3];
 		nIndices = new int[3];
 	}
@@ -16,6 +17,7 @@ public:
 	}
 	int* vIndices;	/* array of triangle vertex indices */
 	int* nIndices;	/* array of triangle normal indices */
+	int* faceNormal;
 };
 
 class Model {
