@@ -7,7 +7,7 @@ using namespace std;
 class Triangle {
 public:
 	Triangle() {
-		faceNormal = new int[3];
+		faceNormal = new float[3];
 		vIndices = new int[3];
 		nIndices = new int[3];
 	}
@@ -17,17 +17,18 @@ public:
 	}
 	int* vIndices;	/* array of triangle vertex indices */
 	int* nIndices;	/* array of triangle normal indices */
-	int* faceNormal;
+	float* faceNormal;
 };
 
 class Model {
 public:
-	Model(): numVertices(0), numNormals(0), numTriangles(0), vertices(nullptr), normals(nullptr), projects(nullptr), triangles(nullptr) {}
+	Model(): numVertices(0), numNormals(0), numTriangles(0), vertices(nullptr), normals(nullptr), projects(nullptr), curs(nullptr), triangles(nullptr) {}
 	~Model() { 
 		if(vertices) delete [] vertices;
 		if(normals) delete [] normals;
 		if(triangles) delete [] triangles;
 		if(projects) delete [] projects;
+		if(curs) delete [] curs;
 	}
 	/* data members are declared public for easy access */
 	int numVertices;		/* number of vertices in model */
@@ -36,6 +37,7 @@ public:
 	float* vertices;		/* array of vertices */
 	float* normals;			/* array of normals */
 	int*   projects;
+	float* curs;
 	Triangle* triangles;	/* array of triangles */
 };
 

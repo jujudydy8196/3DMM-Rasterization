@@ -379,18 +379,32 @@ void fillTriangles ( Triangle* t )
 				{ modelPtr[curModelIdx]->projects[3*vv1], modelPtr[curModelIdx]->projects[3*vv1+1],modelPtr[curModelIdx]->projects[3*vv1+2]},
 				{ modelPtr[curModelIdx]->projects[3*vv2], modelPtr[curModelIdx]->projects[3*vv2+1],modelPtr[curModelIdx]->projects[3*vv2+2]} };
 
-		int vec1[3] = {v[1][0]-v[0][0],v[1][1]-v[0][1],v[1][2]-v[0][2]};
-		int vec2[3] = {v[2][0]-v[0][0],v[2][1]-v[0][1],v[2][2]-v[0][2]};
-		//for back culling
-		t->faceNormal[0] = (vec1[1]*vec2[2])-(vec1[2]*vec2[1]);
-		t->faceNormal[1] = (vec1[2]*vec2[0])-(vec1[0]*vec2[2]);
-		t->faceNormal[2] = (vec1[0]*vec2[1])-(vec1[1]*vec2[0]);
+		//float vec1[3] = {float(v[1][0]-v[0][0]),float(v[1][1]-v[0][1]),float(v[1][2]-v[0][2])};
+		//float vec2[3] = {float(v[2][0]-v[0][0]),float(v[2][1]-v[0][1]),float(v[2][2]-v[0][2])};
 
-		int dotProduct = v[0][0]*(t->faceNormal[0]) + v[0][1]*(t->faceNormal[1]) + v[0][2]*(t->faceNormal[2]);
-		cout << "dotProduct: " << dotProduct << endl;
-		//if ( dotProduct < 0 )
+		//float mag1 = sqrt((vec1[0]*vec1[0])+(vec1[1]*vec1[1])+(vec1[2]*vec1[2]));
+		//float mag2 = sqrt((vec2[0]*vec2[0])+(vec2[1]*vec2[1])+(vec2[2]*vec2[2]));
+	
+		////cout << "mag1: " << mag1 << " mag2: " << mag2 << endl;
+		//for (int i=0 ; i<3; i++)
 		//{
-				//cout << "no display" << endl;
+				////cout << "bvec1: " << vec1[i] << " bvec2: " << vec2[i] << endl;
+				//vec1[i] /= mag1;
+				//vec2[i] /= mag2;
+				////cout << "vec1: " << vec1[i] << " vec2: " << vec2[i] << endl;
+		//}
+		
+		////for back culling
+		//t->faceNormal[0] = (vec1[1]*vec2[2])-(vec1[2]*vec2[1]);
+		//t->faceNormal[1] = (vec1[2]*vec2[0])-(vec1[0]*vec2[2]);
+		//t->faceNormal[2] = (vec1[0]*vec2[1])-(vec1[1]*vec2[0]);
+
+		//float dotProduct = float(v[0][0])*(t->faceNormal[0]) + float(v[0][1])*(t->faceNormal[1]) + float(v[0][2]-1)*(t->faceNormal[2]);
+		////cout << "dotProduct: " << dotProduct << endl;
+		////cout << "---------------------" << endl;
+		//if ( dotProduct < 0.0f )
+		//{
+				////cout << "no display" << endl;
 				//return;
 		//}
 		int ymax = max(v[0][1],max(v[1][1],v[2][1]));
@@ -464,6 +478,10 @@ void displayFunc()
 		// rotate along y-axis
 		curX = prevZ*sin(thetaY)+prevX*cos(thetaY);
 		curZ = prevZ*cos(thetaY)-prevX*sin(thetaY);
+		modelPtr[curModelIdx]->curs[3*i] = curX;
+		modelPtr[curModelIdx]->curs[3*i+1] = curY;
+		modelPtr[curModelIdx]->curs[3*i+2] = curZ;
+
 		// draw the framebuffer
 		ix = int(((1.f-margin)*curX)*screenSide) + screenWidth_half - 1;
 		iy = int(((1.f-margin)*curY)*screenSide) + screenHeight_half - 1;
@@ -476,22 +494,50 @@ void displayFunc()
 			//framebuffer.draw(ix, iy, curZ, vec3(1.f-(iz/670.f)));
 		}
 
-	//for(int j=0; j<modelPtr[curModelIdx]->numTriangles; j++)
-	//{
-		//v0 = modelPtr[curModelIdx]->triangles[j].vIndices[0];
-		//v1 = modelPtr[curModelIdx]->triangles[j].vIndices[1]; 
-		//v2 = modelPtr[curModelIdx]->triangles[j].vIndices[2]; 
+	for(int j=0; j<modelPtr[curModelIdx]->numTriangles; j++)
+	{
+		v0 = modelPtr[curModelIdx]->triangles[j].vIndices[0];
+		v1 = modelPtr[curModelIdx]->triangles[j].vIndices[1]; 
+		v2 = modelPtr[curModelIdx]->triangles[j].vIndices[2]; 
 		//cout << "triangles index: " << v0 << " " << v1 << " " << v2 << endl;
 	
-		//DrawLine(v0,v1);
-		//DrawLine(v1,v2);
-		//DrawLine(v2,v0);
+		float vt[3][3] = {
+				{ modelPtr[curModelIdx]->curs[3*v0], modelPtr[curModelIdx]->curs[3*v0+1],modelPtr[curModelIdx]->curs[3*v0+2]},
+				{ modelPtr[curModelIdx]->curs[3*v1], modelPtr[curModelIdx]->curs[3*v1+1],modelPtr[curModelIdx]->curs[3*v1+2]},
+				{ modelPtr[curModelIdx]->curs[3*v2], modelPtr[curModelIdx]->curs[3*v2+1],modelPtr[curModelIdx]->curs[3*v2+2]} };
+		float vec1[3] = {vt[1][0]-vt[0][0],vt[1][1]-vt[0][1],vt[1][2]-vt[0][2]};
+		float vec2[3] = {vt[2][0]-vt[0][0],vt[2][1]-vt[0][1],vt[2][2]-vt[0][2]};
 
-	//}
+		float mag1 = sqrt((vec1[0]*vec1[0])+(vec1[1]*vec1[1])+(vec1[2]*vec1[2]));
+		float mag2 = sqrt((vec2[0]*vec2[0])+(vec2[1]*vec2[1])+(vec2[2]*vec2[2]));
 	
+		//cout << "mag1: " << mag1 << " mag2: " << mag2 << endl;
+		for (int i=0 ; i<3; i++)
+		{
+				//cout << "bvec1: " << vec1[i] << " bvec2: " << vec2[i] << endl;
+				vec1[i] /= mag1;
+				vec2[i] /= mag2;
+				//cout << "vec1: " << vec1[i] << " vec2: " << vec2[i] << endl;
+		}
+		
+		//Triangle* t = modelPtr[curModelIdx]->triangles[j];
+		//for back culling
+		modelPtr[curModelIdx]->triangles[j].faceNormal[0] = (vec1[1]*vec2[2])-(vec1[2]*vec2[1]);
+		modelPtr[curModelIdx]->triangles[j].faceNormal[1] = (vec1[2]*vec2[0])-(vec1[0]*vec2[2]);
+		modelPtr[curModelIdx]->triangles[j].faceNormal[2] = (vec1[0]*vec2[1])-(vec1[1]*vec2[0]);
 
-	for(int j=0; j<modelPtr[curModelIdx]->numTriangles;j++)
+		float dotProduct = float(vt[0][0])*(modelPtr[curModelIdx]->triangles[j].faceNormal[0]) + float(vt[0][1])*(modelPtr[curModelIdx]->triangles[j].faceNormal[1]) + float(vt[0][2]-1)*(modelPtr[curModelIdx]->triangles[j].faceNormal[2]);
+		//cout << "dotProduct: " << dotProduct << endl;
+		//cout << "---------------------" << endl;
+		if ( dotProduct > 0.0f )
+		{
+				//cout << "no display" << endl;
 			fillTriangles(&modelPtr[curModelIdx]->triangles[j]);
+		}
+	}
+
+	//for(int j=0; j<modelPtr[curModelIdx]->numTriangles;j++)
+			//fillTriangles(&modelPtr[curModelIdx]->triangles[j]);
 
 
     /* display */

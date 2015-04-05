@@ -111,6 +111,7 @@ void readObjSecondPass(Model* model, ifstream& ifs)
 			ifs.getline(buf, 256);
 			/* can be one of v, v//n, v/t, v/t/n*/
 			if(buf[0] == ' ') {
+					//cout << buf << endl;
 				if(strstr(buf, "//")) {		/* v//n */
 					sscanf(buf, "%d//%d %d//%d %d//%d", &v0, &n0, &v1, &n1, &v2, &n2);
 					triangles[tIdx].vIndices[0] = v0;
@@ -119,6 +120,8 @@ void readObjSecondPass(Model* model, ifstream& ifs)
 					triangles[tIdx].nIndices[0] = n0;
 					triangles[tIdx].nIndices[1] = n1;
 					triangles[tIdx].nIndices[2] = n2;
+
+					//cout << "tIdx: " << tIdx << " "  << triangles[tIdx].vIndices[0] << " " << triangles[tIdx].vIndices[1] << " " << triangles[tIdx].vIndices[2] << endl; 
 				}
 				else if(sscanf(buf, "%d/%d/%d", &v0, &t0, &n0)) {//	[> v/t/n <]
 					sscanf(buf, "%d/%d/%d %d/%d/%d %d/%d/%d", &v0, &t0, &n0, &v1, &t1, &n1, &v2, &t2, &n2);
@@ -174,6 +177,7 @@ Model* readObj(const string filename)
 	model->normals = new float[model->numNormals*3+1];
 	model->triangles = new Triangle[model->numTriangles];
 	model->projects = new int[model->numVertices*3+1];
+	model->curs = new float[model->numVertices*3+1];
 	/* go back to the beginning of the stream and read data in the second pass */
 	ifs.close();
 	ifs.open(filename.c_str(), ios::in);
