@@ -38,7 +38,7 @@ Framebuffer framebuffer(screenWidth, screenHeight);
 
 /* model names */
 const char* modelNames[] = {
-    "/Users/judy/Documents/senior/3DMM/3dmm_hw1/model/duck4KN.obj"
+    "/Users/judy/Documents/senior/3DMM/3dmm_hw1/model/couch.obj"
 //	"model/quad.obj"
 //	"model/couch.obj",
 //	"model/blaze.obj",
@@ -526,14 +526,17 @@ void displayFunc()
 		modelPtr[curModelIdx]->triangles[j].faceNormal[1] = (vec1[2]*vec2[0])-(vec1[0]*vec2[2]);
 		modelPtr[curModelIdx]->triangles[j].faceNormal[2] = (vec1[0]*vec2[1])-(vec1[1]*vec2[0]);
 
-		float dotProduct = float(vt[0][0])*(modelPtr[curModelIdx]->triangles[j].faceNormal[0]) + float(vt[0][1])*(modelPtr[curModelIdx]->triangles[j].faceNormal[1]) + float(vt[0][2]-1)*(modelPtr[curModelIdx]->triangles[j].faceNormal[2]);
+		float dotProduct = float(vt[0][0])*(modelPtr[curModelIdx]->triangles[j].faceNormal[0]) + float(vt[0][1])*(modelPtr[curModelIdx]->triangles[j].faceNormal[1]) + float(vt[0][2]-3)*(modelPtr[curModelIdx]->triangles[j].faceNormal[2]);
 		//cout << "dotProduct: " << dotProduct << endl;
 		//cout << "---------------------" << endl;
-		if ( dotProduct > 0.0f )
+		if (!culling)
+			fillTriangles(&modelPtr[curModelIdx]->triangles[j]);
+		else if ( dotProduct > 0.0f && culling)
 		{
 				//cout << "no display" << endl;
 			fillTriangles(&modelPtr[curModelIdx]->triangles[j]);
 		}
+
 	}
 
 	//for(int j=0; j<modelPtr[curModelIdx]->numTriangles;j++)
